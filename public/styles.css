@@ -1,0 +1,54 @@
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  width: 640px;
+  height: 640px;
+  border: 2px solid black;
+}
+
+.square {
+  width: 80px;
+  height: 80px;
+  position: relative;
+}
+
+.white {
+  background-color: #f0d9b5;
+}
+
+.black {
+  background-color: #b58863;
+}
+
+/* Chess Pieces */
+.piece {
+  width: 100%;
+  height: 100%;
+  cursor: grab; 
+}
+
+.piece.dragging {
+  opacity: 0.5;  
+  cursor: grabbing;
+}
+
+/* Droppable styling */
+.square:hover {
+  background-color: #c8e6c9;
+}
+
+.captured-pieces {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 40px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    margin: 10px 0;
+}
+
+.captured-pieces .piece {
+    width: 40px;
+    height: 40px;
+    cursor: default;
+}
