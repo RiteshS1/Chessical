@@ -1,10 +1,19 @@
+*{
+  padding: 0;
+  margin: 0;
+}
 
+h1{
+  text-align: center;
+  margin: 1.2em;
+  color:#b58863
+}
 #board {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   width: 640px;
   height: 640px;
-  border: 2px solid black;
+  border: 2px solid;
 }
 
 .square {
@@ -51,4 +60,10 @@
     width: 40px;
     height: 40px;
     cursor: default;
+}
+#suggest-best-move{
+  background-color: rgb(251, 192, 121);
+  padding: 0.9em;
+  border-radius: 25px;
+  font-size: 0.8em;
 }
