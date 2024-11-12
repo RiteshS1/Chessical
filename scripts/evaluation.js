@@ -29,15 +29,25 @@ function evaluateBoard() {
         for (let col = 0; col < 8; col++) {
             const piece = boardState[row][col];
             if (piece) {
-                const value = getPieceValue(piece);
+                const value = getPieceValue({
+                    ...piece,
+                    row: row,
+                    col: col
+                });
                 score += (piece.color === 'white' ? value : -value);
             }
         }
     }
+
+    // Add bonus for controlling center
+    const centerControl = evaluateCenterControl();
+    score += centerControl;
+
     return score;
 }
 
 // Piece value based on common chess evaluation
+
 function getPieceValue(piece) {
     const values = {
         'pawn': 100,
@@ -47,7 +57,58 @@ function getPieceValue(piece) {
         'queen': 900,
         'king': 20000
     };
-    return values[piece.type] || 0;
+
+    // Add position-based bonuses
+    const positionBonus = {
+        'pawn': [
+            [0,  0,  0,  0,  0,  0,  0,  0],
+            [50, 50, 50, 50, 50, 50, 50, 50],
+            [10, 10, 20, 30, 30, 20, 10, 10],
+            [5,  5, 10, 25, 25, 10,  5,  5],
+            [0,  0,  0, 20, 20,  0,  0,  0],
+            [5, -5,-10,  0,  0,-10, -5,  5],
+            [5, 10, 10,-20,-20, 10, 10,  5],
+            [0,  0,  0,  0,  0,  0,  0,  0]
+        ],
+        'knight': [
+            [-50,-40,-30,-30,-30,-30,-40,-50],
+            [-40,-20,  0,  0,  0,  0,-20,-40],
+            [-30,  0, 10, 15, 15, 10,  0,-30],
+            [-30,  5, 15, 20, 20, 15,  5,-30],
+            [-30,  0, 15, 20, 20, 15,  0,-30],
+            [-30,  5, 10, 15, 15, 10,  5,-30],
+            [-40,-20,  0,  5,  5,  0,-20,-40],
+            [-50,-40,-30,-30,-30,-30,-40,-50]
+        ]
+        // Add similar position tables for other pieces
+    };
+
+    let value = values[piece.type] || 0;
+
+    // Add position-based bonus if available
+    if (positionBonus[piece.type]) {
+        const row = piece.color === 'white' ? 7 - piece.row : piece.row;
+        value += positionBonus[piece.type][row][piece.col];
+    }
+
+    return value;
+}
+
+function evaluateCenterControl() {
+    const centerSquares = [
+        {row: 3, col: 3}, {row: 3, col: 4},
+        {row: 4, col: 3}, {row: 4, col: 4}
+    ];
+    
+    let centerScore = 0;
+    centerSquares.forEach(square => {
+        const piece = boardState[square.row][square.col];
+        if (piece) {
+            centerScore += (piece.color === 'white' ? 30 : -30);
+        }
+    });
+    
+    return centerScore;
 }
 
 // Function to update the evaluation bar
