@@ -1,72 +1,108 @@
 let isWhiteTurn = true; // Track current turn
 
-function suggestBestMove() {
-    console.log("Suggesting best move...");
-    updateBoardState(); // Update the current board state
-    const depth = 3; // Adjust the search depth as needed
-    const bestMove = findBestMove(depth);
-
-    if (bestMove) {
-        console.log("Best move found:", bestMove.moveNotation);
-        highlightBestMove(bestMove.from, bestMove.to);
-    } else {
-        console.log("No valid moves found");
-    }
-}
-
-function findBestMove(depth) {
-    const possibleMoves = generateAllPossibleMoves(isWhiteTurn);
-    if (possibleMoves.length === 0) {
-        const kingPos = findKingPosition(isWhiteTurn);
-        if (kingPos && isKingInCheck(kingPos.row, kingPos.col, isWhiteTurn)) {
-            console.log("Checkmate!");
-        } else {
-            console.log("Stalemate!");
-        }
-        return null;
+class VirtualBoard {
+    constructor() {
+        this.board = new Array(8).fill(null).map(() => new Array(8).fill(null));
+        this.initialize();
     }
 
-    let bestMove = null;
-    let bestValue = isWhiteTurn ? -Infinity : Infinity;
+    initialize() {
+        // Copy current board state
+        document.querySelectorAll('.square').forEach(square => {
+            const piece = square.querySelector('.piece');
+            if (piece) {
+                const index = parseInt(square.getAttribute('data-index'));
+                const row = Math.floor(index / 8);
+                const col = index % 8;
+                this.board[row][col] = piece.getAttribute('data-piece');
+            }
+        });
+    }
 
-    for (const move of possibleMoves) {
-        const value = evaluateMove(move, depth);
+    makeMove(from, to) {
+        const fromRow = Math.floor(from / 8);
+        const fromCol = from % 8;
+        const toRow = Math.floor(to / 8);
+        const toCol = to % 8;
         
-        if (isWhiteTurn && value > bestValue) {
-            bestValue = value;
-            bestMove = move;
-        } else if (!isWhiteTurn && value < bestValue) {
-            bestValue = value;
-            bestMove = move;
-        }
+        const piece = this.board[fromRow][fromCol];
+        this.board[fromRow][fromCol] = null;
+        this.board[toRow][toCol] = piece;
     }
 
-    return bestMove;
+    undoMove(from, to, capturedPiece) {
+        const fromRow = Math.floor(from / 8);
+        const fromCol = from % 8;
+        const toRow = Math.floor(to / 8);
+        const toCol = to % 8;
+        
+        const piece = this.board[toRow][toCol];
+        this.board[fromRow][fromCol] = piece;
+        this.board[toRow][toCol] = capturedPiece;
+    }
 }
 
-function evaluateMove(move, depth) {
-    // Make the move temporarily
-    const sourceSquare = document.querySelector(`[data-index="${move.from}"]`);
-    const targetSquare = document.querySelector(`[data-index="${move.to}"]`);
-    const targetPiece = targetSquare.querySelector('.piece');
-    
-    sourceSquare.removeChild(move.piece);
-    if (targetPiece) {
-        targetSquare.removeChild(targetPiece);
-    }
-    targetSquare.appendChild(move.piece);
+function suggestBestMove() {
+    const button = document.getElementById('suggest-best-move');
+    button.disabled = true;
+    button.textContent = 'Calculating...';
 
-    // Evaluate position
-    const value = minimax(depth - 1, -Infinity, Infinity, !isWhiteTurn);
+    setTimeout(() => {
+        try {
+            // Only look at immediate moves (depth 1)
+            const virtualBoard = new VirtualBoard();
+            const possibleMoves = generateAllPossibleMoves(isWhiteTurn);
+            
+            // Evaluate only the top 10 moves based on basic piece capture value
+            const bestMoves = possibleMoves
+                .map(move => {
+                    const targetSquare = document.querySelector(`[data-index="${move.to}"]`);
+                    const targetPiece = targetSquare.querySelector('.piece');
+                    const captureValue = targetPiece ? getPieceBasicValue(targetPiece.getAttribute('data-piece')) : 0;
+                    return { ...move, value: captureValue };
+                })
+                .sort((a, b) => b.value - a.value)
+                .slice(0, 10);
 
-    // Undo the move
-    targetSquare.removeChild(move.piece);
-    if (targetPiece) {
-        targetSquare.appendChild(targetPiece);
-    }
-    sourceSquare.appendChild(move.piece);
+            // Find the best move among these candidates
+            let bestMove = bestMoves[0];  // Default to first move
+            let bestValue = -Infinity;
 
-    return value;
+            for (const move of bestMoves) {
+                virtualBoard.makeMove(move.from, move.to);
+                const value = evaluateBoard(virtualBoard);
+                virtualBoard.undoMove(move.from, move.to, null);
+                
+                if (value > bestValue) {
+                    bestValue = value;
+                    bestMove = move;
+                }
+            }
+
+            if (bestMove) {
+                highlightBestMove(bestMove.from, bestMove.to);
+            }
+        } catch (error) {
+            console.error("Error calculating best move:", error);
+        } finally {
+            button.disabled = false;
+            button.textContent = 'Suggest Best Move';
+        }
+    }, 0);
+}
+
+// Helper function to get basic piece values
+function getPieceBasicValue(pieceType) {
+    const values = {
+        'pawn': 1,
+        'knight': 3,
+        'bishop': 3,
+        'rook': 5,
+        'queen': 9,
+        'king': 0  // We don't want to prioritize capturing the king
+    };
+    const type = pieceType.split('_')[1];
+    return values[type] || 0;
 }
 
 function generateAllPossibleMoves(isWhite) {
@@ -159,9 +195,9 @@ function undoTemporaryMove(move, capturedPiece) {
     updateBoardState(); // Update the internal board state
 }
 
-function minimax(depth, alpha, beta, isMaximizingPlayer) {
+function minimax(virtualBoard, depth, alpha, beta, isMaximizingPlayer) {
     if (depth === 0) {
-        return evaluatePosition();
+        return evaluatePosition(virtualBoard);
     }
 
     const possibleMoves = generateAllPossibleMoves(isMaximizingPlayer);
@@ -170,7 +206,7 @@ function minimax(depth, alpha, beta, isMaximizingPlayer) {
         let maxEval = -Infinity;
         for (const move of possibleMoves) {
             const capturedPiece = makeTemporaryMove(move);
-            const eval = minimax(depth - 1, alpha, beta, false);
+            const eval = minimax(virtualBoard, depth - 1, alpha, beta, false);
             undoTemporaryMove(move, capturedPiece);
 
             maxEval = Math.max(maxEval, eval);
@@ -182,7 +218,7 @@ function minimax(depth, alpha, beta, isMaximizingPlayer) {
         let minEval = Infinity;
         for (const move of possibleMoves) {
             const capturedPiece = makeTemporaryMove(move);
-            const eval = minimax(depth - 1, alpha, beta, true);
+            const eval = minimax(virtualBoard, depth - 1, alpha, beta, true);
             undoTemporaryMove(move, capturedPiece);
 
             minEval = Math.min(minEval, eval);
@@ -193,8 +229,8 @@ function minimax(depth, alpha, beta, isMaximizingPlayer) {
     }
 }
 
-function evaluatePosition() {
-    return evaluateBoard(); // This function is from evaluation.js
+function evaluatePosition(virtualBoard) {
+    return evaluateBoard(virtualBoard); // This function is from evaluation.js
 }
 
 function highlightBestMove(sourceIndex, targetIndex) {
