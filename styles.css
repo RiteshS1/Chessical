@@ -181,26 +181,16 @@ h1{
 
 /* Add touch support */
 @media (hover: none) {
-    .square:hover {
-        background-color: inherit;
-    }
-    
-    .square.touch-selected {
-        background-color: #c8e6c9;
-    }
-}
-
-.selected-square {
-    background-color: rgba(255, 255, 0, 0.4) !important;
-}
-
-/* Improve touch targets */
-@media (hover: none) {
-    .square:hover {
-        background-color: inherit;
+    .square {
+        touch-action: none;
     }
     
     .piece {
         -webkit-tap-highlight-color: transparent;
+        touch-action: none;
+    }
+    
+    .selected-square {
+        background-color: rgba(255, 255, 0, 0.4) !important;
     }
 }
