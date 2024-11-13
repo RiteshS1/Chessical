@@ -13,6 +13,8 @@ let whiteKingsideRookMoved = false;
 let whiteQueensideRookMoved = false;
 let blackKingsideRookMoved = false;
 let blackQueensideRookMoved = false;
+let selectedPiece = null;
+let selectedSquare = null;
 
 function initBoard() {
     const initialBoard = [
@@ -64,6 +66,8 @@ function initBoard() {
     document.querySelectorAll('.piece').forEach(piece => {
         piece.addEventListener('dragstart', handleDragStart);
     });
+
+    initializeTouchAndClickEvents();
 }
 
 function handleDragStart(event) {
@@ -160,6 +164,7 @@ function handleDrop(event) {
         }
         
         targetSquare.appendChild(draggedPiece);
+        handlePawnPromotion(targetSquare, draggedPiece);
         
         const currentPosition = getCurrentPosition();
         
@@ -174,6 +179,16 @@ function handleDrop(event) {
         
         updateTurn();
         updateEvaluationBar();
+
+        // Add checkmate detection here
+        const pieceColor = draggedPiece.getAttribute('data-piece').split('_')[0];
+        const opponentIsWhite = pieceColor === 'black';
+        
+        if (isCheckmate(opponentIsWhite)) {
+            setTimeout(() => {
+                showGameEndModal(`${pieceColor.charAt(0).toUpperCase() + pieceColor.slice(1)} wins by checkmate!`);
+            }, 100); // Small delay to ensure the UI updates first
+        }
     }
     
     draggedPiece.classList.remove('dragging');
@@ -560,3 +575,168 @@ function doesMoveResolveCheck(piece, sourceIndex, targetIndex) {
 
 // Initialize the board with pieces and listeners
 initBoard();
+
+// Add this function after handleDrop
+function handlePawnPromotion(square, piece) {
+    const row = Math.floor(parseInt(square.getAttribute('data-index')) / 8);
+    const pieceColor = piece.getAttribute('data-piece').split('_')[0];
+    
+    // Check if pawn reached the opposite end
+    if (piece.getAttribute('data-piece').includes('pawn') && 
+        ((pieceColor === 'white' && row === 0) || (pieceColor === 'black' && row === 7))) {
+        
+        // Create and show promotion modal
+        const modal = document.createElement('div');
+        modal.className = 'promotion-modal';
+        
+        // Add promotion piece options
+        const pieces = ['queen', 'rook', 'bishop', 'knight'];
+        pieces.forEach(pieceType => {
+            const option = document.createElement('img');
+            option.src = `${piecesFolder}${pieceColor}_${pieceType}.png`;
+            option.className = 'promotion-option';
+            option.addEventListener('click', () => {
+                // Update the piece
+                piece.src = option.src;
+                piece.setAttribute('data-piece', `${pieceColor}_${pieceType}`);
+                modal.remove();
+                updateBoardState();
+                updateEvaluationBar();
+            });
+            modal.appendChild(option);
+        });
+        
+        document.body.appendChild(modal);
+    }
+}
+
+// Add these functions after your existing isKingInCheck function
+function isCheckmate(isWhiteKing) {
+    // First verify the king is in check
+    const kingPos = findKingPosition(isWhiteKing);
+    if (!kingPos || !isKingInCheck(kingPos.row, kingPos.col, isWhiteKing)) {
+        return false;
+    }
+
+    // Generate all possible moves
+    const allMoves = generateAllPossibleMoves(isWhiteKing);
+    
+    // Try each move to see if it gets out of check
+    for (const move of allMoves) {
+        const sourceSquare = document.querySelector(`[data-index="${move.from}"]`);
+        const piece = sourceSquare.querySelector('.piece');
+        if (doesMoveResolveCheck(piece, move.from, move.to)) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+function showGameEndModal(message) {
+    const modal = document.createElement('div');
+    modal.className = 'promotion-modal'; // Reuse the promotion modal styling
+    
+    const messageElement = document.createElement('p');
+    messageElement.textContent = message;
+    messageElement.style.textAlign = 'center';
+    messageElement.style.marginBottom = '10px';
+    
+    const newGameButton = document.createElement('button');
+    newGameButton.textContent = 'New Game';
+    newGameButton.style.padding = '5px 10px';
+    newGameButton.onclick = () => {
+        location.reload();
+    };
+    
+    modal.appendChild(messageElement);
+    modal.appendChild(newGameButton);
+    document.body.appendChild(modal);
+}
+
+function initializeTouchAndClickEvents() {
+    // Add click handlers to all squares
+    document.querySelectorAll('.square').forEach(square => {
+        square.addEventListener('click', handleSquareClick);
+    });
+}
+
+function handleSquareClick(event) {
+    const square = event.currentTarget;
+    const piece = square.querySelector('.piece');
+
+    // If no piece is selected
+    if (!selectedPiece) {
+        if (piece) {
+            // Select the piece
+            selectedPiece = piece;
+            selectedSquare = square;
+            square.classList.add('selected-square');
+        }
+        return;
+    }
+
+    // If a piece is already selected
+    if (selectedPiece) {
+        const sourceIndex = parseInt(selectedSquare.getAttribute('data-index'));
+        const targetIndex = parseInt(square.getAttribute('data-index'));
+
+        // Clear previous selection
+        selectedSquare.classList.remove('selected-square');
+
+        // If clicking the same square, deselect the piece
+        if (square === selectedSquare) {
+            selectedPiece = null;
+            selectedSquare = null;
+            return;
+        }
+
+        // Try to make the move
+        if (isValidMove(selectedPiece, sourceIndex, targetIndex)) {
+            const targetPiece = square.querySelector('.piece');
+            
+            // Handle capture
+            if (targetPiece) {
+                const capturedPieceColor = targetPiece.getAttribute('data-piece').split('_')[0];
+                if (capturedPieceColor === selectedPiece.getAttribute('data-piece').split('_')[0]) {
+                    selectedPiece = null;
+                    selectedSquare = null;
+                    return;
+                }
+                targetPiece.remove();
+                
+                if (capturedPieceColor === 'white') {
+                    capturedWhitePieces.push(targetPiece);
+                } else {
+                    capturedBlackPieces.push(targetPiece);
+                }
+                
+                displayCapturedPieces();
+            }
+
+            // Move the piece
+            square.appendChild(selectedPiece);
+            handlePawnPromotion(square, selectedPiece);
+            
+            const currentPosition = getCurrentPosition();
+            positionHistory.push(currentPosition);
+            
+            updateTurn();
+            updateEvaluationBar();
+
+            // Check for checkmate
+            const pieceColor = selectedPiece.getAttribute('data-piece').split('_')[0];
+            const opponentIsWhite = pieceColor === 'black';
+            
+            if (isCheckmate(opponentIsWhite)) {
+                setTimeout(() => {
+                    showGameEndModal(`${pieceColor.charAt(0).toUpperCase() + pieceColor.slice(1)} wins by checkmate!`);
+                }, 100);
+            }
+        }
+
+        // Reset selection
+        selectedPiece = null;
+        selectedSquare = null;
+    }
+}

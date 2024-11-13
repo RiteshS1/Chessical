@@ -116,3 +116,91 @@ h1{
     padding: 2px 4px;
     border-radius: 3px;
 }
+
+.promotion-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border: 2px solid #333;
+    border-radius: 8px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.promotion-option {
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.promotion-option:hover {
+    transform: scale(1.1);
+}
+
+/* Add responsive design */
+@media (max-width: 768px) {
+    #board {
+        width: 100vw;
+        height: 100vw;
+        max-width: 640px;
+        max-height: 640px;
+    }
+    
+    .square {
+        width: 12.5vw;
+        height: 12.5vw;
+        max-width: 80px;
+        max-height: 80px;
+    }
+    
+    .piece {
+        width: 100%;
+        height: 100%;
+    }
+    
+    #evaluation-bar {
+        right: 10px;
+        height: 300px;
+    }
+    
+    .captured-pieces {
+        padding: 2px;
+    }
+    
+    .captured-pieces .piece {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+/* Add touch support */
+@media (hover: none) {
+    .square:hover {
+        background-color: inherit;
+    }
+    
+    .square.touch-selected {
+        background-color: #c8e6c9;
+    }
+}
+
+.selected-square {
+    background-color: rgba(255, 255, 0, 0.4) !important;
+}
+
+/* Improve touch targets */
+@media (hover: none) {
+    .square:hover {
+        background-color: inherit;
+    }
+    
+    .piece {
+        -webkit-tap-highlight-color: transparent;
+    }
+}
