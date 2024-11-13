@@ -655,14 +655,31 @@ function showGameEndModal(message) {
 }
 
 function initializeTouchAndClickEvents() {
-    // Add click handlers to all squares
     document.querySelectorAll('.square').forEach(square => {
+        // Add click handler for desktop
         square.addEventListener('click', handleSquareClick);
+        
+        // Prevent default touch behavior that might interfere with our logic
+        square.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            handleSquareClick(e);
+        });
+        
+        // Prevent any default touch behaviors that might interfere
+        square.addEventListener('touchend', (e) => {
+            e.preventDefault();
+        });
     });
 }
 
 function handleSquareClick(event) {
-    const square = event.currentTarget;
+    // Get the actual square element, whether from touch or click
+    const square = event.target.classList.contains('square') ? 
+        event.target : 
+        event.target.closest('.square');
+    
+    if (!square) return;
+    
     const piece = square.querySelector('.piece');
 
     // If no piece is selected
