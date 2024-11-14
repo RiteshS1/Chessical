@@ -1,27 +1,25 @@
-*{
+* {
   padding: 0;
   margin: 0;
 }
 
 body {
-    background-color: #2c3e50;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-x: hidden;
-    padding: 2em;
-    text-align: center;
+  background-color: #2c3e50;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: scroll ;
+  padding: 4em;
+  text-align: center;
 }
 
-h1{
+h1 {
   text-align: center;
   margin: 1.2em;
-  color:#b58863;
+  color: #b58863;
   font-size: 2.3em;
-  
 }
-
 
 .game-container {
   position: relative;
@@ -29,9 +27,9 @@ h1{
   flex-direction: column;
   align-items: center;
   gap: 0.5em;
-  margin:0 2em ;
- 
+  margin: 0 2em;
 }
+
 #board {
   display: grid;
   grid-template-columns: repeat(8, 80px);
@@ -48,6 +46,7 @@ h1{
   justify-content: center;
   align-items: center;
 }
+
 .square-label {
   font-size: 12px;
   color: #888;
@@ -65,11 +64,11 @@ h1{
 .piece {
   width: 100%;
   height: 100%;
-  cursor: grab; 
+  cursor: grab;
 }
 
 .piece.dragging {
-  opacity: 0.5;  
+  opacity: 0.5;
   cursor: grabbing;
 }
 
@@ -79,22 +78,23 @@ h1{
 }
 
 .captured-pieces {
-    width: 640px;
-    display: flex;
-    flex-wrap: wrap;
-    min-height: 40px;
-    padding: 5px;
-    border: 1px solid #ccc;
-    margin: 5px 0;
-    background-color: rgba(255, 255, 255, 0.8);
+  width: 640px;
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 40px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  margin: 5px 0;
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 .captured-pieces .piece {
-    width: 40px;
-    height: 40px;
-    cursor: default;
+  width: 40px;
+  height: 40px;
+  cursor: default;
 }
-#suggest-best-move{
+
+#suggest-best-move {
   background-color: rgb(251, 192, 121);
   padding: 0.9em;
   border-radius: 25px;
@@ -104,137 +104,158 @@ h1{
 }
 
 #evaluation-bar {
-    width: 30px;
-    height: 400px;
-    border: 1px solid #ccc;
-    position: fixed;
-    right: 10px;
-    top: 20%;
-    
-    
-    background-color: white;
-    z-index: 100;
+  width: 30px;
+  height: 400px;
+  border: 1px solid #ccc;
+  position: fixed;
+  right: 10px;
+  top: 20%;
+  background-color: white;
+  z-index: 100;
 }
 
 #evaluation-score {
-    width: 100%;
-    height: 50%;  /* Start at neutral position */
-    background-color: #000;
-    position: absolute;
-    bottom: 0;
-    transition: height 0.3s ease;
+  width: 100%;
+  height: 50%;  /* Start at neutral position */
+  background-color: #000;
+  position: absolute;
+  bottom: 0;
+  transition: height 0.3s ease;
 }
 
 .highlighted-square {
-    background-color: rgba(147, 245, 82, 0.944) !important;
-    animation: highlightPulse 4s ease-in-out;
+  background-color: rgba(147, 245, 82, 0.944) !important;
+  animation: highlightPulse 4s ease-in-out;
 }
 
 @keyframes highlightPulse {
-    0% { background-color: rgba(255, 255, 0, 0.5); }
-    80% { background-color: rgba(255, 255, 0, 0.5); }
-    100% { background-color: inherit; }
+  0% { background-color: rgba(172, 241, 76, 0.887); }
+  80% { background-color: rgba(139, 238, 63, 0.914); }
+  100% { background-color: inherit; }
 }
 
 .move-notation {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    font-size: 12px;
-    color: #000;
-    background: rgba(255, 255, 255, 0.8);
-    padding: 2px 4px;
-    border-radius: 3px;
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  font-size: 12px;
+  color: #000;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 2px 4px;
+  border-radius: 3px;
 }
 
 .promotion-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border: 2px solid #333;
-    border-radius: 8px;
-    display: flex;
-    gap: 10px;
-    z-index: 1000;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border: 2px solid #333;
+  border-radius: 8px;
+  display: flex;
+  gap: 10px;
+  z-index: 1000;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
 .promotion-option {
-    width: 60px;
-    height: 60px;
-    cursor: pointer;
-    transition: transform 0.2s;
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+  transition: transform 0.2s;
 }
 
 .promotion-option:hover {
-    transform: scale(1.1);
+  transform: scale(1.1);
 }
 
-/* Add responsive design */
+/* Responsive design adjustments */
 @media (max-width: 768px) {
-   
-    
-    .game-container{
-      position: relative;
-      transform: scale(0.9);
-      transform-origin:center;
-      margin: 0 2em;
-      padding: 4em;
-    }
-
-    #board, .captured-pieces {
-      max-width: 640px;
-      
-    }
-     
-    #evaluation-bar {
-      position: fixed;
-        width: 15px;
-        height: 300px;
-        right: -2em;
-       
-    }
-}
-
-@media (max-width: 500px) {
-    .game-container {
-        transform: scale(0.9);
-        transform-origin:top;
-      margin: 0 6em;
-     
-    }
-    #board,.captured-pieces{
-     
-      margin-left: 12em;
-    }
+  .game-container {
   
-    
-    
-    
-    
-    
-    #evaluation-bar {
-      width: 10px;
-      height: 300px;
-      position: fixed;
+    margin: 4em; /* Reduced margins for better spacing */
+  
+  }
+
+  #board, .captured-pieces {
+ /* Reduced width for board and captured pieces */
+    margin: 0 auto; /* Center the board */
+   transform: scale(0.8);
+   transform-origin: top;
+  }
+
+  #evaluation-bar {
+    width: 15px; /* Narrower evaluation bar */
+    height: 250px; /* Adjust height for fit */
+    right: 0;
+    position: fixed; /* Position at the right side */
+  }
+
+  h1 {
+    font-size: 1.8em; /* Slightly smaller font size */
+    margin: 1em 0; /* Adjusted margin */
+  }
+
+  #suggest-best-move {
+    padding: 0.7em; /* Slightly smaller padding */
+    font-size: 0.75em; /* Reduced font size */
+  }
+
+  .promotion-option {
+    width: 50px; /* Smaller promotion option */
+    height: 50px; /* Smaller promotion option */
   }
 }
+
+/* Adjustments for screens less than 450px wide */
+@media (max-width: 450px) {
+  .game-container {
+    margin: 0 2em; /* Reduced margin for better spacing */
+    padding: 1.5em; /* Reduced padding */
+  }
+
+  #board, .captured-pieces {
+    transform: scale(0.8); /* Slightly smaller scale for better fit */
+    transform-origin: right;
+  }
+
+  #evaluation-bar {
+    width: 6px; /* Even narrower evaluation bar */
+    height: 150px; /* Reduced height */
+    right: 0; /* Position at the right side */
+  }
+
+  h1 {
+    font-size: 1.3em; /* Smaller font size */
+    margin: 0.5em 0; /* Reduced margin */
+  }
+
+  #suggest-best-move {
+    padding: 0.5em; /* Smaller padding */
+    font-size: 0.6em; /* Smaller font size */
+  }
+
+  .promotion-option {
+    width: 40px; /* Smaller promotion option */
+    height: 40px; /* Smaller promotion option */
+  }
+}
+
 
 /* Add touch support */
 @media (hover: none) {
     .square {
         touch-action: none;
     }
-    
+
     .piece {
         -webkit-tap-highlight-color: transparent;
         touch-action: none;
     }
-    
+
     .selected-square {
-        background-color: rgba(255, 255, 0, 0.4) !important;
+        background-color: #CCCC !important;
     }
 }
