@@ -16,6 +16,23 @@ let blackQueensideRookMoved = false;
 let selectedPiece = null;
 let selectedSquare = null;
 
+// Sound effects
+const sounds = {
+    move: new Audio('sounds/move.mp3'),
+    capture: new Audio('sounds/capture.mp3'),
+    castle: new Audio('sounds/castle.mp3'),
+    check: new Audio('sounds/check.mp3'),
+    promote: new Audio('sounds/promote.mp3'),
+    notify: new Audio('sounds/notify.mp3')
+};
+
+// Preload sounds
+function preloadSounds() {
+    for (const sound in sounds) {
+        sounds[sound].load(); // Preload each sound
+    }
+}
+
 function initBoard() {
     const initialBoard = [
         ['black_rook', 'black_knight', 'black_bishop', 'black_queen', 'black_king', 'black_bishop', 'black_knight', 'black_rook'],
@@ -26,7 +43,6 @@ function initBoard() {
     ];
 
     let isWhiteSquare = true;
-
     const fileLabels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
     for (let i = 0; i < 64; i++) {
@@ -233,7 +249,12 @@ function isValidMove(draggedPiece, sourceIndex, targetIndex) {
     if (targetPiece) {
         const sourceColor = draggedPiece.getAttribute('data-piece').split('_')[0];
         const targetColor = targetPiece.getAttribute('data-piece').split('_')[0];
-        if (sourceColor === targetColor) return false;
+        if (sourceColor === targetColor) return false; // Cannot capture own piece
+    }
+
+    // Check if the target piece is a king
+    if (targetPiece && targetPiece.getAttribute('data-piece').includes('king')) {
+        return false; // Cannot capture the king
     }
 
     // Check for check resolution
@@ -470,6 +491,17 @@ function validateKingMove(sourceRow, sourceCol, targetRow, targetCol) {
         // Check if the target square is under attack
         const isWhiteKing = document.querySelector(`[data-index="${sourceRow * 8 + sourceCol}"]`)
             .querySelector('.piece').getAttribute('data-piece').startsWith('white');
+        
+        // Check if the target square is adjacent to the opposing king
+        const opponentKingPos = findKingPosition(!isWhiteKing);
+        if (opponentKingPos) {
+            const opponentKingRow = opponentKingPos.row;
+            const opponentKingCol = opponentKingPos.col;
+            if (Math.abs(opponentKingRow - targetRow) <= 1 && Math.abs(opponentKingCol - targetCol) <= 1) {
+                return false; // Cannot move into a square adjacent to the opposing king
+            }
+        }
+
         return !isKingInCheck(targetRow, targetCol, isWhiteKing);
     }
     
@@ -574,6 +606,7 @@ function doesMoveResolveCheck(piece, sourceIndex, targetIndex) {
 }
 
 // Initialize the board with pieces and listeners
+preloadSounds(); // Preload sounds
 initBoard();
 
 // Add this function after handleDrop
@@ -599,6 +632,7 @@ function handlePawnPromotion(square, piece) {
                 // Update the piece
                 piece.src = option.src;
                 piece.setAttribute('data-piece', `${pieceColor}_${pieceType}`);
+                sounds.promote.play(); // Play promote sound
                 modal.remove();
                 updateBoardState();
                 updateEvaluationBar();
@@ -721,7 +755,8 @@ function handleSquareClick(event) {
                     return;
                 }
                 targetPiece.remove();
-                
+                sounds.capture.play(); // Play capture sound
+
                 if (capturedPieceColor === 'white') {
                     capturedWhitePieces.push(targetPiece);
                 } else {
@@ -733,6 +768,7 @@ function handleSquareClick(event) {
 
             // Move the piece
             square.appendChild(selectedPiece);
+            sounds.move.play(); // Play move sound
             handlePawnPromotion(square, selectedPiece);
             
             const currentPosition = getCurrentPosition();
@@ -747,6 +783,7 @@ function handleSquareClick(event) {
             
             if (isCheckmate(opponentIsWhite)) {
                 setTimeout(() => {
+                    sounds.notify.play(); // Play checkmate sound
                     showGameEndModal(`${pieceColor.charAt(0).toUpperCase() + pieceColor.slice(1)} wins by checkmate!`);
                 }, 100);
             }
