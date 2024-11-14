@@ -3,17 +3,41 @@
   margin: 0;
 }
 
+body {
+    background-color: #2c3e50;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    padding: 2em;
+    text-align: center;
+}
+
 h1{
   text-align: center;
   margin: 1.2em;
-  color:#b58863
+  color:#b58863;
+  font-size: 2.3em;
+  
+}
+
+
+.game-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+  margin:0 2em ;
+ 
 }
 #board {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(8, 80px);
   width: 640px;
   height: 640px;
-  border: 2px solid;
+  border: 2px solid #333;
 }
 
 .square {
@@ -55,12 +79,14 @@ h1{
 }
 
 .captured-pieces {
+    width: 640px;
     display: flex;
     flex-wrap: wrap;
     min-height: 40px;
     padding: 5px;
     border: 1px solid #ccc;
-    margin: 10px 0;
+    margin: 5px 0;
+    background-color: rgba(255, 255, 255, 0.8);
 }
 
 .captured-pieces .piece {
@@ -73,6 +99,8 @@ h1{
   padding: 0.9em;
   border-radius: 25px;
   font-size: 0.8em;
+  margin-top: 0.5em;
+  cursor: pointer;
 }
 
 #evaluation-bar {
@@ -80,10 +108,12 @@ h1{
     height: 400px;
     border: 1px solid #ccc;
     position: fixed;
-    right: 50px;
-    top: 50%;
-    transform: translateY(-50%);
-    overflow: hidden;
+    right: 10px;
+    top: 20%;
+    
+    
+    background-color: white;
+    z-index: 100;
 }
 
 #evaluation-score {
@@ -96,7 +126,7 @@ h1{
 }
 
 .highlighted-square {
-    background-color: rgba(255, 255, 0, 0.5) !important;
+    background-color: rgba(147, 245, 82, 0.944) !important;
     animation: highlightPulse 4s ease-in-out;
 }
 
@@ -145,38 +175,52 @@ h1{
 
 /* Add responsive design */
 @media (max-width: 768px) {
-    #board {
-        width: 100vw;
-        height: 100vw;
-        max-width: 640px;
-        max-height: 640px;
-    }
+   
     
-    .square {
-        width: 12.5vw;
-        height: 12.5vw;
-        max-width: 80px;
-        max-height: 80px;
+    .game-container{
+      position: relative;
+      transform: scale(0.9);
+      transform-origin:center;
+      margin: 0 2em;
+      padding: 4em;
     }
+
+    #board, .captured-pieces {
+      max-width: 640px;
+      
+    }
+     
+    #evaluation-bar {
+      position: fixed;
+        width: 15px;
+        height: 300px;
+        right: -2em;
+       
+    }
+}
+
+@media (max-width: 500px) {
+    .game-container {
+        transform: scale(0.9);
+        transform-origin:top;
+      margin: 0 6em;
+     
+    }
+    #board,.captured-pieces{
+     
+      margin-left: 12em;
+    }
+  
     
-    .piece {
-        width: 100%;
-        height: 100%;
-    }
+    
+    
+    
     
     #evaluation-bar {
-        right: 10px;
-        height: 300px;
-    }
-    
-    .captured-pieces {
-        padding: 2px;
-    }
-    
-    .captured-pieces .piece {
-        width: 30px;
-        height: 30px;
-    }
+      width: 10px;
+      height: 300px;
+      position: fixed;
+  }
 }
 
 /* Add touch support */
