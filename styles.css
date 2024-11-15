@@ -277,3 +277,64 @@ p {
         background-color: #CCCC !important;
     }
 }
+
+body.dark-mode {
+  background-color: #1a1a1a;
+  color: #f0f0f0;
+}
+
+.dark-mode .main-container {
+  background-color: #000000; /* Adjust as needed */
+}
+
+.dark-mode h1, .dark-mode p {
+  color: #b58863; /* Adjust as needed */
+}
+
+.dark-mode .captured-pieces {
+  background-color: rgba(50, 50, 50, 0.8);
+  border: 1px solid #444;
+}
+
+#github-icon {
+  width: 30px; /* Adjust size as needed */
+  height: 30px; /* Adjust size as needed */
+  margin-left: 10px; /* Space between button and icon */
+}
+
+.top-right-corner {
+    position: fixed;
+    top: 20px; /* Adjust as needed */
+    right: 20px; /* Adjust as needed */
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between icons */
+}
+
+.mode-toggle {
+    width: 30px; /* Adjust size as needed */
+    height: 30px; /* Adjust size as needed */
+    cursor: pointer
+}
+
+footer {
+    margin-top: 4em; /* Space above the footer */
+    padding: 1em;
+
+    text-align: center;
+    border-top: 1px solid #ccc; /* Optional border */
+}
+
+footer h2 {
+    font-size: 1.2em;
+    color: #ffffff; /* Text color */
+}
+
+footer .name {
+    color: #007bff; /* Link color */
+    text-decoration: none; /* Remove underline */
+}
+
+footer .name:hover {
+    text-decoration: underline; /* Underline on hover */
+}
