@@ -8,18 +8,24 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>♔ Chessical ♔</h1>
-    
-    <div class="game-container">
-        <div id="captured-white" class="captured-pieces">White Captured Pieces</div>
-        <div id="board"></div>
-        <div id="captured-black" class="captured-pieces">Black Captured Pieces</div>
-        <div id="evaluation-bar">
-            <div id="evaluation-score"></div>
+    <div class="main-container">
+        <div id="text">
+            <h1>♔ Chessical ♔</h1>
+            <p>The JavaScript powered Chess Engine🎯</p>
         </div>
+
+        <div class="game-container">
+            <div id="captured-white" class="captured-pieces">White Captured Pieces</div>
+            <div id="board"></div>
+            <div id="captured-black" class="captured-pieces">Black Captured Pieces</div>
+        </div>
+
+        <button id="suggest-best-move">Suggest Best Move</button>
     </div>
 
-    <button id="suggest-best-move">Suggest Best Move</button>
+    <div id="evaluation-bar">
+        <div id="evaluation-score"></div>
+    </div>
 
     <script src="scripts/board.js"></script>
     <script src="scripts/evaluation.js"></script>
