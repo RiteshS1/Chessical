@@ -794,3 +794,12 @@ function handleSquareClick(event) {
         selectedSquare = null;
     }
 }
+
+
+// Add this to your existing JavaScript file
+const modeToggle = document.getElementById('mode-toggle');
+
+modeToggle.addEventListener('click', function() {
+    const isDarkMode = document.body.classList.toggle('dark-mode');
+    modeToggle.src = isDarkMode ? 'pieces/night-mode.png' : 'pieces/day-mode.png';
+});
