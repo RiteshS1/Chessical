@@ -9,9 +9,15 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow-x: scroll ;
+  overflow-x: hidden;
   padding: 4em;
   text-align: center;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 h1 {
@@ -21,6 +27,11 @@ h1 {
   font-size: 2.3em;
 }
 
+p {
+  color: #fff;
+  margin-bottom: 0.5em;
+}
+
 .game-container {
   position: relative;
   display: flex;
@@ -28,23 +39,28 @@ h1 {
   align-items: center;
   gap: 0.5em;
   margin: 0 2em;
+  width: 90%;
+}
+
+#captured-white {
+  margin-bottom: 0;
 }
 
 #board {
   display: grid;
-  grid-template-columns: repeat(8, 80px);
-  width: 640px;
-  height: 640px;
+  grid-template-columns: repeat(8, 1fr);
+  width: 100%;
+  aspect-ratio: 1;
   border: 2px solid #333;
 }
 
 .square {
-  width: 80px;
-  height: 80px;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
+ aspect-ratio: 1;
+  background-color: transparent;
 }
 
 .square-label {
@@ -62,9 +78,12 @@ h1 {
 
 /* Chess Pieces */
 .piece {
-  width: 100%;
-  height: 100%;
+  width: 80%;
+  height: 80%;
   cursor: grab;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .piece.dragging {
@@ -78,20 +97,24 @@ h1 {
 }
 
 .captured-pieces {
-  width: 640px;
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   min-height: 40px;
   padding: 5px;
   border: 1px solid #ccc;
-  margin: 5px 0;
+  margin: 0;
   background-color: rgba(255, 255, 255, 0.8);
+ 
 }
 
 .captured-pieces .piece {
   width: 40px;
   height: 40px;
   cursor: default;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 #suggest-best-move {
@@ -116,7 +139,7 @@ h1 {
 
 #evaluation-score {
   width: 100%;
-  height: 50%;  /* Start at neutral position */
+  height: 50%;
   background-color: #000;
   position: absolute;
   bottom: 0;
@@ -174,75 +197,70 @@ h1 {
 /* Responsive design adjustments */
 @media (max-width: 768px) {
   .game-container {
-  
-    margin: 4em; /* Reduced margins for better spacing */
-  
+    margin: 4em;
   }
 
   #board, .captured-pieces {
- /* Reduced width for board and captured pieces */
-    margin: 0 auto; /* Center the board */
-   transform: scale(0.8);
-   transform-origin: top;
+    width: 100%;
+    height: auto;
   }
 
   #evaluation-bar {
-    width: 15px; /* Narrower evaluation bar */
-    height: 250px; /* Adjust height for fit */
+    width: 15px;
+    height: 250px;
     right: 0;
-    position: fixed; /* Position at the right side */
+    position: fixed;
   }
 
   h1 {
-    font-size: 1.8em; /* Slightly smaller font size */
-    margin: 1em 0; /* Adjusted margin */
+    font-size: 1.8em;
+    margin: 1em 0;
   }
 
   #suggest-best-move {
-    padding: 0.7em; /* Slightly smaller padding */
-    font-size: 0.75em; /* Reduced font size */
+    padding: 0.7em;
+    font-size: 0.75em;
   }
 
   .promotion-option {
-    width: 50px; /* Smaller promotion option */
-    height: 50px; /* Smaller promotion option */
+    width: 50px;
+    height: 50px;
   }
 }
 
 /* Adjustments for screens less than 450px wide */
 @media (max-width: 450px) {
   .game-container {
-    margin: 0 2em; /* Reduced margin for better spacing */
-    padding: 1.5em; /* Reduced padding */
+    margin: 0 2em;
+    padding: 1.5em;
   }
 
   #board, .captured-pieces {
-    transform: scale(0.8); /* Slightly smaller scale for better fit */
-    transform-origin: right;
+    width: 100%;
+    height: auto;
   }
 
   #evaluation-bar {
-    width: 6px; /* Even narrower evaluation bar */
-    height: 150px; /* Reduced height */
-    right: 0; /* Position at the right side */
+    width: 6px;
+    height: 150px;
+    right: 0;
   }
 
   h1 {
-    font-size: 1.3em; /* Smaller font size */
-    margin: 0.5em 0; /* Reduced margin */
+    font-size: 1.3em;
+    margin: 0.5em 0;
   }
 
   #suggest-best-move {
-    padding: 0.5em; /* Smaller padding */
-    font-size: 0.6em; /* Smaller font size */
+    padding: 0.5em;
+    font-size: 0.6em;
   }
 
   .promotion-option {
-    width: 40px; /* Smaller promotion option */
-    height: 40px; /* Smaller promotion option */
+    width: 40px;
+    height: 40px;
   }
 }
-
 
 /* Add touch support */
 @media (hover: none) {
