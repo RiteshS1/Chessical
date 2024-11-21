@@ -88,7 +88,7 @@ function suggestBestMove() {
             button.disabled = false;
             button.textContent = 'Suggest Best Move';
         }
-    }, 0);
+    }, 1000);
 }
 
 // Helper function to get basic piece values
